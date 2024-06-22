@@ -1090,3 +1090,8 @@ func (c *Client) NewSubAccountTransferHistoryService() *SubAccountTransferHistor
 func (c *Client) NewListUserUniversalTransferService() *ListUserUniversalTransferService {
 	return &ListUserUniversalTransferService{c: c}
 }
+
+// NewCreateMarginLoanService 初始化 CreateMarginLoanService
+func (c *Client) NewCreateMarginLoanService() *CreateMarginLoanService {
+    return &CreateMarginLoanService{c: c}
+}

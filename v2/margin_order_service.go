@@ -5,6 +5,82 @@ import (
 	"net/http"
 )
 
+// CreateMarginLoanService 创建杠杆借币服务
+type CreateMarginLoanService struct {
+    c      *Client
+    asset  string
+    amount string
+    symbol string
+    isIsolated bool
+    isBorrow bool
+}
+
+// Asset 设置资产
+func (s *CreateMarginLoanService) Asset(asset string) *CreateMarginLoanService {
+    s.asset = asset
+    return s
+}
+
+// Amount 设置金额
+func (s *CreateMarginLoanService) Amount(amount string) *CreateMarginLoanService {
+    s.amount = amount
+    return s
+}
+
+func (s *CreateMarginLoanService) Symbol(symbol string) *CreateMarginLoanService {
+    s.symbol = symbol
+    return s
+}
+
+func (s *CreateMarginLoanService) IsIsolated(isolated bool) *CreateMarginLoanService {
+    s.isIsolated = isolated
+    return s
+}
+
+func (s *CreateMarginLoanService) IsBorrow(borrow bool) *CreateMarginLoanService {
+	s.isBorrow = borrow
+    return s
+}
+
+// Do 发送请求
+func (s *CreateMarginLoanService) Do(ctx context.Context) (*CreateMarginLoanResponse, error) {
+    r := &request{
+        method:   http.MethodPost,
+        endpoint: "/sapi/v1/margin/borrow-repay",
+        secType:  secTypeSigned,
+    }
+	isolatedStr := "FALSE"
+	if s.isIsolated {
+		isolatedStr = "TRUE"
+	}
+	_tpye := "BORROW"
+	if !s.isBorrow {
+		_tpye = "REPAY"
+	}
+    r.setFormParams(params{
+        "asset":  s.asset,
+        "amount": s.amount,
+        "type": _tpye,
+        "isIsolated": isolatedStr,
+		"symbol": s.symbol, 
+    })
+    data, err := s.c.callAPI(ctx, r)
+    if err != nil {
+        return nil, err
+    }
+    res := new(CreateMarginLoanResponse)
+    err = json.Unmarshal(data, res)
+    if err != nil {
+        return nil, err
+    }
+    return res, nil
+}
+
+// CreateMarginLoanResponse 自定义结构体
+type CreateMarginLoanResponse struct {
+    TranID int64 `json:"tranId"`
+}
+
 // CreateMarginOrderService create order
 type CreateMarginOrderService struct {
 	c                *Client
